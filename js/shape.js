@@ -225,5 +225,35 @@ Shape.Cylinder = function(origin, radius, vertices, height) {
   return cylinder;
 };
 
+Shape.Octahedron = function(origin, dx, dy, dz) {
+  dx = (typeof dx === 'number') ? dx : 1;
+  dy = (typeof dy === 'number') ? dy : 1;
+  dz = (typeof dz === 'number') ? dz : 1;
+  /* Declare the center of the shape to make rotations easy */
+  var center = origin.translate(dx/2, dy/2, dz/2);
+  var faces = [];
+
+  /* Draw the upper triangle /\ and rotate it */
+  var upperTriangle = new Path([
+    origin.translate(0, 0, 0.5),
+    origin.translate(dx/2, dy/2, dz/2+0.5),
+    origin.translate(0, dy, 0.5)
+  ]);
+
+  var lowerTriangle = new Path([
+    origin.translate(0, 0, 0.5),
+    origin.translate(0, dy, 0.5),
+    origin.translate(dx/2, dy/2, -dz/2+0.5)
+  ]);
+
+  for (var i = 0; i < 4; i++) {
+    faces.push(upperTriangle.rotateZ(center, i * Math.PI / 2));
+    faces.push(lowerTriangle.rotateZ(center, i * Math.PI / 2));
+  }
+
+  /* We need to scale the shape along the x & y directions to make the
+   * sides equilateral triangles */
+  return new Shape(faces).scale(center, Math.sqrt(2)/2, Math.sqrt(2)/2, 1);
+}
 
 module.exports = Shape;
